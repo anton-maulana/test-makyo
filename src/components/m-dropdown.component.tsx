@@ -1,6 +1,5 @@
 import {MDropdownProps} from "./m-dropdown.props";
-import {useContext, useEffect, useRef, useState} from "react";
-import {AppContext, ServicesContextType} from "../index";
+import {ReactNode, useEffect, useRef, useState} from "react";
 import React from "react";
 import {SearchIcon} from "../assets/svgs-icon";
 import Portal from "./portal.component";
@@ -13,24 +12,24 @@ const MDropdownComponent: React.FC<MDropdownProps> = ({data, titleProperty}) => 
     const [position, setPosition] = useState({ top: '0px', left: '0px' });
     const [searchInput, setSearchInput] = useState("");
 
-    const handleClick = (event: any) => {
+    const onClickDropdown = () :void => {
         const rect =  buttonRef.current?.getBoundingClientRect() as DOMRectReadOnly;
 
         setPosition({
-            top: `${rect?.bottom + window.scrollY}px`, // Position below the button
-            left: `${rect?.left + window.scrollX}px`  // Align with button left
+            top: `${rect?.bottom + window.scrollY}px`,
+            left: `${rect?.left + window.scrollX}px`
         });
         setIsOpen(!isOpen);
     };
 
 
-    const updateButtonWidth = () => {
+    const updateButtonWidth = () :void => {
         if (buttonRef.current) {
             setButtonWidth(buttonRef.current.offsetWidth);
         }
     };
 
-    const handleClickOutside = (event: MouseEvent) => {
+    const onBlurDropdown = (event: MouseEvent) => {
         const node = event.target as HTMLElement;
         if(node.className.includes("m-dropdown")) {
             return
@@ -41,31 +40,36 @@ const MDropdownComponent: React.FC<MDropdownProps> = ({data, titleProperty}) => 
         }
     };
 
-    useEffect(() => {
-        updateButtonWidth();
+    const highlightText = (text: string) :string => {
+        if(searchInput.length > 0) {
+            const regex = new RegExp(searchInput, 'gi');
+            return text.replace(regex, match => `<mark style="background: #aeccfc">${match}</mark>`);
+        }
+        else
+            return text
+    }
 
-        window.addEventListener('resize', updateButtonWidth);
-        window.addEventListener('click', handleClickOutside);
-
-        return () => {
-            window.removeEventListener('resize', updateButtonWidth);
-            window.removeEventListener('click', handleClickOutside);
-        };
-    }, []);
-
-    const renderListDropdown = () => {
+    const renderListDropdown = () :ReactNode => {
         if (typeof data[0] == "string") {
-            const items = data as string[];
+            let items = data as string[];
+
+            if (searchInput.length > 0)
+                items = items.filter(e => e.toLowerCase().indexOf(searchInput.toLowerCase()) !== -1);
+
             return items.map( (item, indexRow) =>
                 <div key={indexRow}>
-                    {item}
+                    <div dangerouslySetInnerHTML={{ __html: highlightText(item) }} />
                 </div>
             )
         } else if (titleProperty) {
-            const items = data as Record<string, any>[];
+            let items = data as Record<string, any>[];
+
+            if (searchInput.length > 0)
+                items = items.filter(e => e[titleProperty].toLowerCase().indexOf(searchInput.toLowerCase()) !== -1);
+            
             return items.map( (item, indexRow) =>
                 <div key={indexRow}>
-                    {item[titleProperty]}
+                    <div dangerouslySetInnerHTML={{ __html: highlightText(item[titleProperty]) }} />
                 </div>
             )
         } else {
@@ -73,21 +77,37 @@ const MDropdownComponent: React.FC<MDropdownProps> = ({data, titleProperty}) => 
         }
     }
 
-
-    const onTyping = (e:any) => {
-        return(null)
+    const onTyping = (e: React.FormEvent<HTMLInputElement>) :void => {
+        setSearchInput(e.currentTarget.value)
     }
 
+    useEffect(() => {
+        updateButtonWidth();
+
+        window.addEventListener('resize', updateButtonWidth);
+        window.addEventListener('click', onBlurDropdown);
+
+        return () => {
+            window.removeEventListener('resize', updateButtonWidth);
+            window.removeEventListener('click', onBlurDropdown);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!isOpen)  {
+            setSearchInput("");
+        }
+    }, [isOpen]);    
 
     return (
         <React.Fragment>
             <button className={`bg-gray-300 w-full h-full relative ${isOpen? "caret-close": "caret-open"} m-dropdown`}
-                    onClick={handleClick}
+                    onClick={onClickDropdown}
                     ref={buttonRef}>
             </button>
             {isOpen &&
                 <Portal>
-                    <div id={"box-dropdown"} ref={dropdownRef} className={"h-64 bg-amber-800 absolute flex wrapper-box-dropdown"}
+                    <div id={"box-dropdown"} ref={dropdownRef} className={"h-64 bg-slate-300 absolute flex wrapper-box-dropdown"}
                          style={{ width: buttonWidth, top: position.top, left: position.left }}>
                         <div className={"h-full w-full"}>
                             <div className="flex flex-col w-full h-[inherit]">
