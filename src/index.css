@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.caret-close::after {
+  content: '';
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  right: 0.7rem;
+  background: url('./chevron-up-svgrepo-com.svg') no-repeat center center;
+  background-size: contain;
+  top: 4px;
+}
+.caret-open::after {
+  content: '';
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  right: 0.7rem;
+  background: url('./chevron-down-svgrepo-com.svg') no-repeat center center;
+  background-size: contain;
+  top: 4px;
+}
