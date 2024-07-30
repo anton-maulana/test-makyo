@@ -4,7 +4,6 @@ import MDropdownComponent from "../components/m-dropdown.component";
 
 function ListProductsModule () {
     const [products, setProducts] = useState([]);
-    const [isOpen, setIsOpen] = useState(false);
     const {dummyService}  = useContext(AppContext) || {} as ServicesContextType;
 
     useEffect(() => {
@@ -23,7 +22,7 @@ function ListProductsModule () {
                 Label
             </div>
             <div className="col-span-3">
-                <MDropdownComponent data={products} titleProperty={"title"} />
+                <MDropdownComponent data={products} titleProperty={"title"} multiple/>
             </div>
         </div>
     )

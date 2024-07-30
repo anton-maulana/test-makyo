@@ -1,3 +1,7 @@
-.wrapper-box-dropdown {
+.wrapper-box-dropdown button.item-options:hover {
+    background: aquamarine;
+}
 
+.wrapper-box-dropdown button.item-options.active {
+    background: aquamarine;
 }
