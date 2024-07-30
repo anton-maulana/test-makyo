@@ -1,7 +1,7 @@
 import {MDropdownProps} from "./m-dropdown.props";
 import {ReactNode, useEffect, useRef, useState} from "react";
 import React from "react";
-import {SearchIcon} from "../assets/svgs-icon";
+import {CloseIcon, SearchIcon} from "../assets/svgs-icon";
 import Portal from "./portal.component";
 import "./m-dropdown.style.css"
 import { v4 as uuidv4 } from 'uuid';
@@ -17,7 +17,7 @@ const MDropdownComponent: React.FC<MDropdownProps> = ({
     const [listOptions, setListOptions] = useState<Record<string, any>[]>([]);
     const [isOpen, setIsOpen] = useState(false);
     const [buttonWidth, setButtonWidth] = useState(0);
-    const buttonRef = useRef<HTMLButtonElement | null>(null);
+    const buttonRef = useRef<HTMLDivElement | null>(null);
     const dropdownRef = useRef<HTMLDivElement | null>(null);
     const [position, setPosition] = useState({ top: '0px', left: '0px' });
     const [searchInput, setSearchInput] = useState("");
@@ -146,25 +146,33 @@ const MDropdownComponent: React.FC<MDropdownProps> = ({
        setListOptions(list);
     }, [data, titleProperty]);
 
+
+    const removeItem = (event: React.MouseEvent<HTMLButtonElement>, item: Record<string, any>) => {
+        event.stopPropagation();
+        onCLickItemDropdown(item)
+    }
+
     return (
         <React.Fragment>
-            <button className={`bg-gray-300 w-full h-full relative ${isOpen? "caret-close": "caret-open"} m-dropdown`}
+            <div className={`w-full h-full relative ${isOpen? "caret-close": "caret-open"} m-dropdown gap-2`}
                     onClick={onClickDropdown}
                     ref={buttonRef}>
-                <div className={"flex flex-row justify-items-start gap-2 selected-dropdown"}>
                     {titleProperty && selected.map(e =>
-                        <small onClick={() => onCLickItemDropdown(e) } className={"selected-item"} key={e.uuid}>{e[titleProperty]}</small>
+                        <button onClick={i => removeItem(i, e)}
+                                className={"selected-item gap-1"} key={e.uuid}>
+                            <small>{e[titleProperty]}</small>
+                            <CloseIcon height={"16px"} width={"16px"} />
+                        </button>
                     )}
                     {!titleProperty && selected.map(e =>
-                        <div className={"selected-item"} key={e.uuid}>{e.name}</div>
+                        <small className={"selected-item"} key={e.uuid}>{e.name}</small>
                     )}
-                </div>
-            </button>
+            </div>
             {isOpen &&
                 <Portal>
                     <div id={"box-dropdown"} ref={dropdownRef} className={"h-64 bg-gray-300 absolute flex wrapper-box-dropdown shadow-md"}
                          style={{ width: buttonWidth, top: position.top, left: position.left }}>
-                        <div className={"h-full w-full "}>
+                        <div className={"h-full w-full transition-shadow duration-300 "}>
                             <div className="flex flex-col w-full h-[inherit] p-2.5">
                                 {search && <div className={"flex flex-row w-full items-center"}>
                                     <SearchIcon height={"16px"} width={"16px"} className={"absolute"}/>
