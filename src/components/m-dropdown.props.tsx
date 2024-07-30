@@ -7,5 +7,6 @@ export interface MDropdownProps extends React.HTMLAttributes<HTMLDivElement> {
     outlined?: boolean,
     search?: boolean,
     titleProperty?: string,
-    multiple?: boolean
+    multiple?: boolean,
+    zIndexDropdown?: number
 }

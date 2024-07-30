@@ -12,7 +12,10 @@ const MDropdownComponent: React.FC<MDropdownProps> = ({
         onSelected,
         outlined = false,
         multiple = false,
-        search = true
+        search = true,
+        id,
+        zIndexDropdown,
+        ...restProps 
     }) => {
     const [listOptions, setListOptions] = useState<Record<string, any>[]>([]);
     const [isOpen, setIsOpen] = useState(false);
@@ -74,6 +77,12 @@ const MDropdownComponent: React.FC<MDropdownProps> = ({
             listSelected = [item]
         }
         setSelected([...listSelected]);
+        if(titleProperty){
+            onSelected && onSelected(item[titleProperty], item)
+        } else {
+            onSelected && onSelected(item.name, item)
+            
+        }
     }
 
 
@@ -134,6 +143,13 @@ const MDropdownComponent: React.FC<MDropdownProps> = ({
     }, [isOpen]);
 
     useEffect(() => {
+        if(!multiple && selected.length > 1) {
+            const resetValues = [selected[0]]
+            setSelected([...resetValues])
+        }
+    }, [multiple]);
+
+    useEffect(() => {
         let list: Record<string, any>[] = [];
         if (typeof data[0] === "string") {
             const it = data as string[];
@@ -154,24 +170,29 @@ const MDropdownComponent: React.FC<MDropdownProps> = ({
 
     return (
         <React.Fragment>
-            <div className={`w-full h-full relative ${isOpen? "caret-close": "caret-open"} m-dropdown gap-2`}
+            <div {...restProps} style={{ zIndex: zIndexDropdown}} id={id}className={`w-full h-full relative ${isOpen? "caret-close": "caret-open"} m-dropdown gap-2`}
                     onClick={onClickDropdown}
                     ref={buttonRef}>
-                    {titleProperty && selected.map(e =>
+                    {titleProperty && multiple && selected.map(e =>
                         <button onClick={i => removeItem(i, e)}
                                 className={"selected-item gap-1"} key={e.uuid}>
                             <small>{e[titleProperty]}</small>
                             <CloseIcon height={"16px"} width={"16px"} />
                         </button>
                     )}
+
+                    {titleProperty && !multiple && selected.map(e =>
+                        e[titleProperty]
+                    )}
+
                     {!titleProperty && selected.map(e =>
                         <small className={"selected-item"} key={e.uuid}>{e.name}</small>
                     )}
             </div>
             {isOpen &&
                 <Portal>
-                    <div id={"box-dropdown"} ref={dropdownRef} className={"h-64 bg-gray-300 absolute flex wrapper-box-dropdown shadow-md"}
-                         style={{ width: buttonWidth, top: position.top, left: position.left }}>
+                    <div id={`${id}-box-dropdown`} ref={dropdownRef} className={"h-64 bg-[#f9f9f9] absolute flex wrapper-box-dropdown shadow-md"}
+                         style={{ width: buttonWidth, top: position.top, left: position.left, zIndex: zIndexDropdown }}>
                         <div className={"h-full w-full transition-shadow duration-300 "}>
                             <div className="flex flex-col w-full h-[inherit] p-2.5">
                                 {search && <div className={"flex flex-row w-full items-center"}>

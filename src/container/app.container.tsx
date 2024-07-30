@@ -22,10 +22,6 @@ function App() {
           <main className="p-4 mt-4">
               <RouterProvider router={AppRouter} />
           </main>
-
-          <footer className="bg-gray-200 p-4 text-center mt-4">
-              <p>&copy; 2023 My Website. All rights reserved.</p>
-          </footer>
       </div>
   );
 }
